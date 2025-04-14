@@ -1,16 +1,22 @@
 package collection;
 
-public class MyArrayList<E> {
     /**
-     * Простейшая реализация ArrayList.
+     * Простейшая реализация двусвязного LinkedList.
      */
-        private Object[] elements;
-        private int size;
+    public class MyLinkedList2<E> {
+        private class Node {
+            E data;
+            Node next;
+            Node prev;
 
-        public MyArrayList() {
-            elements = new Object[10];
-            size = 0;
+            Node(E data) {
+                this.data = data;
+            }
         }
+
+        private Node head;
+        private Node tail;
+        private int size;
 
         /**
          * Добавляет элемент в конец списка.
@@ -18,8 +24,15 @@ public class MyArrayList<E> {
          * @param element элемент, который нужно добавить
          */
         public void add(E element) {
-            ensureCapacity();
-            elements[size++] = element;
+            Node newNode = new Node(element);
+            if (tail != null) {
+                tail.next = newNode;
+                newNode.prev = tail;
+            } else {
+                head = newNode;
+            }
+            tail = newNode;
+            size++;
         }
 
         /**
@@ -32,10 +45,22 @@ public class MyArrayList<E> {
             if (index < 0 || index >= size) {
                 throw new IndexOutOfBoundsException();
             }
-            E removedElement = (E) elements[index];
-            System.arraycopy(elements, index + 1, elements, index, size - index - 1);
-            elements[--size] = null; // Убираем ссылку для сборщика мусора
-            return removedElement;
+            Node current = head;
+            for (int i = 0; i < index; i++) {
+                current = current.next;
+            }
+            if (current.prev != null) {
+                current.prev.next = current.next;
+            } else {
+                head = current.next; // Если удаляем голову
+            }
+            if (current.next != null) {
+                current.next.prev = current.prev;
+            } else {
+                tail = current.prev; // Если удаляем хвост
+            }
+            size--;
+            return current.data;
         }
 
         /**
@@ -48,7 +73,11 @@ public class MyArrayList<E> {
             if (index < 0 || index >= size) {
                 throw new IndexOutOfBoundsException();
             }
-            return (E) elements[index];
+            Node current = head;
+            for (int i = 0; i < index; i++) {
+                current = current.next;
+            }
+            return current.data;
         }
 
         /**
@@ -62,8 +91,12 @@ public class MyArrayList<E> {
             if (index < 0 || index >= size) {
                 throw new IndexOutOfBoundsException();
             }
-            E oldElement = (E) elements[index];
-            elements[index] = element;
+            Node current = head;
+            for (int i = 0; i < index; i++) {
+                current = current.next;
+            }
+            E oldElement = current.data;
+            current.data = element;
             return oldElement;
         }
 
@@ -72,15 +105,20 @@ public class MyArrayList<E> {
          *
          * @param fromIndex начальный индекс
          * @param toIndex конечный индекс
-         * @return новый MyArrayList, содержащий элементы из указанного диапазона
+         * @return новый MyDoublyLinkedList, содержащий элементы из указанного диапазона
          */
-        public MyArrayList<E> subList(int fromIndex, int toIndex) {
+        public MyLinkedList2<E> subList(int fromIndex, int toIndex) {
             if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
                 throw new IndexOutOfBoundsException();
             }
-            MyArrayList<E> subList = new MyArrayList<>();
+            MyLinkedList2<E> subList = new MyLinkedList2<>();
+            Node current = head;
+            for (int i = 0; i < fromIndex; i++) {
+                current = current.next;
+            }
             for (int i = fromIndex; i < toIndex; i++) {
-                subList.add((E) elements[i]);
+                subList.add(current.data);
+                current = current.next;
             }
             return subList;
         }
@@ -92,14 +130,5 @@ public class MyArrayList<E> {
          */
         public int size() {
             return size;
-        }
-
-        private void ensureCapacity() {
-            if (size == elements.length) {
-                Object[] newElements = new Object[elements.length * 2];
-                System.arraycopy(elements, 0, newElements, 0, elements.length);
-                elements = newElements;
-            }
-        }
     }
-
+}

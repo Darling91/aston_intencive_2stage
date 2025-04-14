@@ -3,7 +3,7 @@ package collection;
 /**
  * Простейшая реализация LinkedList.
  */
-public class MyLinkedList<E> {
+public class MyLinkedLists<E> {
     private class Node {
         E data;
         Node next;
@@ -105,11 +105,11 @@ public class MyLinkedList<E> {
      * @param toIndex конечный индекс
      * @return новый MyLinkedList, содержащий элементы из указанного диапазона
      */
-    public MyLinkedList<E> subList(int fromIndex, int toIndex) {
+    public MyLinkedLists<E> subList(int fromIndex, int toIndex) {
         if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
             throw new IndexOutOfBoundsException();
         }
-        MyLinkedList<E> subList = new MyLinkedList<>();
+        MyLinkedLists<E> subList = new MyLinkedLists<>();
         Node current = head;
         for (int i = 0; i < fromIndex; i++) {
             current = current.next;
