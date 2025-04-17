@@ -5,6 +5,11 @@ public class DoublyLinkedList<E> {
     private Node<E> tail;
     private int size = 0;
 
+    DoublyLinkedList(Node<E> head, Node<E> tail) {
+        this.head = head;
+        this.tail = tail;
+    }
+
     /**
      * Вставляет элемент в начало списка
      * для этой операции не требуется проходка по всему списку
@@ -59,24 +64,32 @@ public class DoublyLinkedList<E> {
      * @param value
      */
     public void insertInPosition(int index, E value) {
-        Node<E> currentNode = null;
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException();
         } else if (index == 0) {
             insertAtHead(value);
         } else if (index == size - 1) {
             insertAtTail(value);
-        } else if (currentNode == head) {
+        } else if (index < size / 2) {
             //вставка в середину при переборе от головы
+            Node<E> currentNode = head;
             for (int i = 0; i < index; i++) {
                 currentNode = currentNode.next;
             }
+            Node<E> previousNode = currentNode.prev;
+            //вставка нового узла между предыдущим и текущим
+            Node<E> newNode = new Node<E>(value);
+            newNode.next = currentNode;
+            newNode.prev = previousNode;
+            previousNode.next = newNode;
+            currentNode.prev = newNode;
+            size++;
             //вставка в середину при переборе от хвоста
         }else{
+            Node<E> currentNode = tail;
             for(int i = size - 1; i > index; i--) {
                 currentNode = currentNode.prev;
             }
-        }
             Node<E> previousNode = currentNode.prev;
             //вставка нового узла между предыдущим и текущим
             Node<E> newNode = new Node<E>(value);
@@ -86,6 +99,7 @@ public class DoublyLinkedList<E> {
             currentNode.prev = newNode;
             size++;
         }
+    }
 
 
     /**
@@ -135,10 +149,10 @@ public class DoublyLinkedList<E> {
      * @return
      */
     public Node<E> searchByIndex(int index) {
-        Node<E> temp = null;
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException();
-        } else if (temp == head) {
+        } else if (index < size / 2) {
+            Node<E> temp = head;
             for (int i = 0; i < index; i++) {
                 /*
                 Начинаем с 0 и идем до тех пор, пока индекс не станет на единицу меньше
@@ -148,11 +162,12 @@ public class DoublyLinkedList<E> {
             }
             return temp;
         }else{
+           Node<E> temp = tail;
+            for (int i = size - 1; i > index; i--){
             /*
             Начинаем с последнего элемента и идем до тех пор, пока индекс не станет на единицу больше
             потому что мы переходим к предыдущему узлу внутри цикла
              */
-            for (int i = size - 1; i > index; i--){
                 temp = temp.prev;
             }
             return temp;
@@ -161,26 +176,37 @@ public class DoublyLinkedList<E> {
 
 
     /**
-     * Поиск элемента по значению
+     * Поиск элемента по значению с головы
      * @param value
      * @return
      */
-    public Node<E> searchByValue(E value){
-        Node<E> temp = null;
-        if(temp == head) {
-            while (null != temp.next && temp.item != value) {
-                temp = temp.next;
-            }
-        }else {
-            while (null != temp.prev && temp.item != value) {
-                temp = temp.prev;
-            }
+    public Node<E> searchByValueAtHead(E value){
+        Node<E> temp = head;
+        while (null != temp.next && temp.item != value) {
+            temp = temp.next;
         }
-        if(temp.item == value){
+        if (temp.item == value) {
             return temp;
         }
         return null;
     }
+
+    /**
+     * Поиск элемента по значению с хвоста
+     * @param value
+     * @return
+     */
+    public Node<E> searchByValueAtTail(E value){
+        Node<E> temp = tail;
+        while (null != temp.prev && temp.item != value) {
+            temp = temp.prev;
+        }
+        if (temp.item == value) {
+            return temp;
+        }
+        return null;
+    }
+
 
     /**
      * Удаляет элемент, присутствующий в головном узле
@@ -213,24 +239,30 @@ public class DoublyLinkedList<E> {
      * @param index
      */
     public void deleteFromPosition(int index){
-        Node<E> deleteNode = null;
         if(index < 0 || index >= size){
             throw new IndexOutOfBoundsException();
         }
-        else if(deleteNode == head) {
+        else if(index < size / 2) {
+            Node<E> deleteNode = head;
             for (int i = 0; i < index; i++) {
                 deleteNode = deleteNode.next;
             }
+            Node<E> previousNode = deleteNode.prev;
+            Node<E> nextNode = deleteNode.next;
+            previousNode.next = nextNode;
+            nextNode.prev = previousNode;
+            size --;
         }else {
-            for (int i = size-1; i > index; i--) {
+            Node<E> deleteNode = tail;
+            for (int i = size - 1; i > index; i--) {
                 deleteNode = deleteNode.prev;
             }
+            Node<E> previousNode = deleteNode.prev;
+            Node<E> nextNode = deleteNode.next;
+            previousNode.next = nextNode;
+            nextNode.prev = previousNode;
+            size--;
         }
-        Node<E> previousNode = deleteNode.prev;
-        Node<E> nextNode = deleteNode.next;
-        previousNode.next = nextNode;
-        nextNode.prev = previousNode;
-        size --;
     }
 
     /**
